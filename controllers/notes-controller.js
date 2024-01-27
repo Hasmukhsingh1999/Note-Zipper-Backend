@@ -1,11 +1,19 @@
 const notes = require("../utils/data");
 
-allNotes = async (req, res) => {
+const allNotes = async (req, res) => {
   try {
-    res.send(notes);
+    if (!notes || notes.length === 0) {
+      return res.status(404).json({ error: "No notes found." });
+    }
+
+    res.json(notes);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
+
 
 module.exports = { allNotes };
