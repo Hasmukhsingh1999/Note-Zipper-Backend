@@ -8,8 +8,8 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-router.get("/notes", allNotes);
+router.get("/api/notes", allNotes);
 
-router.post('/users',createUser)
+router.post('/api/users',createUser)
 
 module.exports = router;
