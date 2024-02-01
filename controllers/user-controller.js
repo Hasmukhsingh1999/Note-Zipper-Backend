@@ -1,10 +1,16 @@
 const User = require("../models/user-model");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const createToken = (userId) => {
+  // Create a JWT token with the user ID as the payload
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
+};
 
 const createUser = async (req, res) => {
   try {
     const { name, email, password, profileImage } = req.body;
-    
+
     // Check if the user already exists
     const userExists = await User.findOne({ email });
 
@@ -33,7 +39,12 @@ const createUser = async (req, res) => {
         profileImage: user.profileImage,
       };
 
-      return res.status(201).json(sanitizedUser);
+      // Create and return a JWT token
+      const token = createToken(user._id);
+
+      return res
+        .status(201)
+        .json({ success: true, user: sanitizedUser, token });
     } else {
       return res.status(400).json({ error: "Error Occurred" });
     }
@@ -55,8 +66,12 @@ const loginUser = async (req, res) => {
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (isPasswordValid) {
-        // Password is valid, proceed with login logic
-        return res.status(200).json({ message: "Login successful" });
+        // Password is valid, create and return a JWT token
+        const token = createToken(user._id);
+
+        return res
+          .status(200)
+          .json({ success: true, token, message: "Login successful" });
       } else {
         // Password is invalid
         return res.status(401).json({ error: "Invalid credentials" });
@@ -71,17 +86,22 @@ const loginUser = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  // You can handle logout logic here (e.g., invalidate the token on the client side)
+  res.status(200).json({ success: true, message: "Logout successful" });
+};
+
 const getAllUser = async (req, res) => {
   try {
     // Fetch all users from the database
     const users = await User.find();
 
     // Return the list of users
-    return res.status(200).json({ users });
+    return res.status(200).json({ success: true, users });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = { createUser, loginUser, getAllUser };
+module.exports = { createUser, loginUser, logout, getAllUser };
