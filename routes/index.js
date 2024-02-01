@@ -1,6 +1,6 @@
 var express = require("express");
 const { allNotes, getNotesById } = require("../controllers/notes-controller");
-const { createUser, loginUser, getAllUser } = require("../controllers/user-controller");
+const { createUser, loginUser, getAllUser, logout } = require("../controllers/user-controller");
 var router = express.Router();
 
 /* GET home page. */
@@ -18,5 +18,8 @@ router.post("/api/login", loginUser);
 
 // GET USER
 router.get("/api/users",getAllUser);
+
+// LOGOUT USER
+router.get('/api/logout',logout)
 
 module.exports = router;

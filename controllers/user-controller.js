@@ -9,7 +9,7 @@ const createToken = (userId) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, profileImage } = req.body;
+    const { name, email, password, profileImage,role } = req.body;
 
     // Check if the user already exists
     const userExists = await User.findOne({ email });
@@ -27,8 +27,10 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       profileImage,
+      role,
     });
-
+    console.log(user);
+    const token = createToken(user._id);
     if (user) {
       // Return a sanitized user object without the password field
       const sanitizedUser = {
@@ -37,14 +39,11 @@ const createUser = async (req, res) => {
         email: user.email,
         role: user.role,
         profileImage: user.profileImage,
+        token: createToken(user._id),
       };
 
-      // Create and return a JWT token
-      const token = createToken(user._id);
-
-      return res
-        .status(201)
-        .json({ success: true, user: sanitizedUser, token });
+      res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
+      return res.status(201).json({ success: true, user: sanitizedUser });
     } else {
       return res.status(400).json({ error: "Error Occurred" });
     }
@@ -68,7 +67,7 @@ const loginUser = async (req, res) => {
       if (isPasswordValid) {
         // Password is valid, create and return a JWT token
         const token = createToken(user._id);
-
+        res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
         return res
           .status(200)
           .json({ success: true, token, message: "Login successful" });
@@ -87,8 +86,12 @@ const loginUser = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  // You can handle logout logic here (e.g., invalidate the token on the client side)
-  res.status(200).json({ success: true, message: "Logout successful" });
+  try {
+    res.clearCookie("token");
+    res.status(200).json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    res.status(200).json({ success: true, message: "Logout successful" });
+  }
 };
 
 const getAllUser = async (req, res) => {
