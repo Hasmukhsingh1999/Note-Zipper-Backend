@@ -9,7 +9,7 @@ const createToken = (userId) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, profileImage,role } = req.body;
+    const { name, email, password, profileImage, role } = req.body;
 
     // Check if the user already exists
     const userExists = await User.findOne({ email });
@@ -33,17 +33,17 @@ const createUser = async (req, res) => {
     const token = createToken(user._id);
     if (user) {
       // Return a sanitized user object without the password field
-      const sanitizedUser = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        profileImage: user.profileImage,
-        token: createToken(user._id),
-      };
+      // const sanitizedUser = {
+      //   _id: user._id,
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role,
+      //   profileImage: user.profileImage,
+      //   token: createToken(user._id),
+      // };
 
       res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-      return res.status(201).json({ success: true, user: sanitizedUser });
+      return res.status(201).json({ success: true, message: "User created" });
     } else {
       return res.status(400).json({ error: "Error Occurred" });
     }
@@ -97,7 +97,7 @@ const logout = async (req, res) => {
 const getAllUser = async (req, res) => {
   try {
     // Fetch all users from the database
-    const users = await User.find();
+    const users = await User.find({}, { password: 0, _id: 0 });
 
     // Return the list of users
     return res.status(200).json({ success: true, users });
