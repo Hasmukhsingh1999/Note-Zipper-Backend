@@ -10,6 +10,7 @@ router.get("/", function (req, res, next) {
 
 router.get("/api/notes", allNotes);
 
+// CREATE USER /POST
 router.post('/api/users',createUser)
 
 module.exports = router;

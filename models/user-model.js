@@ -15,10 +15,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  dateOfBirth: {
-    type: Date,
-    required: true,
-  },
+
   address: {
     street: String,
     city: String,
@@ -36,11 +33,8 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "admin"], 
     default: "user", 
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+ 
+},{timestamps:true});
 
 const User = mongoose.model("User", userSchema);
 
