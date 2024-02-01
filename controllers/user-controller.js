@@ -15,7 +15,7 @@ const createUser = async (req, res) => {
       email,
       password,
       profileImage,
-    }).select("-password")
+    }).select("-password");
 
     if (user) {
       res.status(201).json({
@@ -28,6 +28,16 @@ const createUser = async (req, res) => {
     } else {
       res.status(400).json({ error: "Error Occurred" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const getAllUser = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(201).json({ result: users });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
