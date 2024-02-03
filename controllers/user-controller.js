@@ -9,11 +9,13 @@ const createToken = (userId) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, profileImage, role } = req.body;
+    const { name, email, password } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
-      return res.status(400).json({ error: "Name, email, and password are required" });
+      return res
+        .status(400)
+        .json({ error: "Name, email, and password are required" });
     }
 
     // Check if the user already exists
@@ -31,8 +33,6 @@ const createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      profileImage,
-      role,
     });
 
     if (user) {
@@ -43,12 +43,12 @@ const createUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        profileImage: user.profileImage,
       };
 
       res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-      return res.status(201).json({ success: true, user: sanitizedUser, token });
+      return res
+        .status(201)
+        .json({ success: true, user: sanitizedUser, token });
     } else {
       return res.status(400).json({ error: "Error Occurred" });
     }
@@ -57,7 +57,6 @@ const createUser = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const loginUser = async (req, res) => {
   try {
