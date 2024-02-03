@@ -11,6 +11,11 @@ const createUser = async (req, res) => {
   try {
     const { name, email, password, profileImage, role } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "Name, email, and password are required" });
+    }
+
     // Check if the user already exists
     const userExists = await User.findOne({ email });
 
@@ -29,21 +34,21 @@ const createUser = async (req, res) => {
       profileImage,
       role,
     });
-    console.log(user);
-    const token = createToken(user._id);
+
     if (user) {
+      const token = createToken(user._id);
+
       // Return a sanitized user object without the password field
-      // const sanitizedUser = {
-      //   _id: user._id,
-      //   name: user.name,
-      //   email: user.email,
-      //   role: user.role,
-      //   profileImage: user.profileImage,
-      //   token: createToken(user._id),
-      // };
+      const sanitizedUser = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profileImage: user.profileImage,
+      };
 
       res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-      return res.status(201).json({ success: true, message: "User created" });
+      return res.status(201).json({ success: true, user: sanitizedUser, token });
     } else {
       return res.status(400).json({ error: "Error Occurred" });
     }
@@ -52,6 +57,7 @@ const createUser = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 const loginUser = async (req, res) => {
   try {
